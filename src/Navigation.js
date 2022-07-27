@@ -6,20 +6,23 @@ import MainPage from "./pages/MainPage";
 import Navbar from "./components/Navbar";
 import AdminProvider from "./contexts/AdminProvider";
 import AdminEditPage from "./pages/AdminEditPage";
+import ClientProvider from "./contexts/ClientProvider";
 
 function Navigation() {
   return (
-    <BrowserRouter>
-      <AdminProvider>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/admin/add" element={<AdminAddPAge />} />
-          <Route path="/admin/edit/:id" element={<AdminEditPage />} />
-        </Routes>
-      </AdminProvider>
-    </BrowserRouter>
+    <ClientProvider>
+      <BrowserRouter>
+        <AdminProvider>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin/add" element={<AdminAddPAge />} />
+            <Route path="/admin/edit/:id" element={<AdminEditPage />} />
+          </Routes>
+        </AdminProvider>
+      </BrowserRouter>
+    </ClientProvider>
   );
 }
 
