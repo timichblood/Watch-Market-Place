@@ -20,11 +20,22 @@ function ClientProvider({ children }) {
   const [searchWord, setSearchWord] = React.useState("");
   const [filterByPrice, setFilterByPrice] = React.useState([0, 999999]);
 
+  const limit = 3;
+  const [pagesCount, setPagesCount] = React.useState(1);
+  const [currerntPage, setCurruntPage] = React.useState(1);
+  // ! Math.ceil(1.2) - 2
+  // ! Math.floor(1.2) - 1
+  // ! Math.round(1.2) - 1
+
   const getWatches = () => {
     fetch(
-      `${watchesApi}?q=${searchWord}&price_gte=${filterByPrice[0]}&price_lte=${filterByPrice[1]}`
+      `${watchesApi}?q=${searchWord}&price_gte=${filterByPrice[0]}&price_lte=${filterByPrice[1]}&_limit=${limit}&_page=${currerntPage}`
     )
-      .then((res) => res.json())
+      .then((res) => {
+        let count = Math.ceil(res.headers.get("X-Total-Count") / limit);
+        setPagesCount(count);
+        return res.json();
+      })
       .then((data) => {
         let action = {
           type: "GET_WATCHES",
@@ -33,14 +44,38 @@ function ClientProvider({ children }) {
         dispatch(action);
       });
   };
+  // ! Busket functional
+  const addWatchToBusket = (watch) => {
+    let busket = JSON.parse(localStorage.getItem("basket"));
+    if (!busket) {
+      busket = {
+        totalPrice: 0,
+        products: [],
+      };
+    }
+    let watchToBusket = {
+      ...watch,
+      count: 1,
+      subPrice: watch.price,
+    };
+    busket.products.push(watchToBusket);
+    busket.totalPrice = busket.products.reduce((prev, item) => {
+      return prev + item.subPrice;
+    }, 0);
+    console.log(busket);
+  };
 
   const data = {
     watches: state.watches,
     searchWord,
     filterByPrice,
+    pagesCount,
+    currerntPage,
     getWatches,
     setSearchWord,
     setFilterByPrice,
+    setCurruntPage,
+    addWatchToBusket,
   };
 
   return (
